@@ -149,14 +149,15 @@ WORKDIR /usr/src
 # Install specific version of torch
 RUN pip install torch=="$PYTORCH_VERSION+cpu" --index-url "${PYTORCH_INDEX}/cpu" --no-cache-dir
 
+
 COPY server/Makefile server/Makefile
 
 # Install server
 COPY proto proto
 COPY server server
 RUN cd server && \
-    make gen-server && \
-    pip install ".[accelerate]" --no-cache-dir
+    make gen-server && dnf install -y git && \
+    pip install ".[accelerate,openvino]" --no-cache-dir
 
 # Patch codegen model changes into transformers 4.34
 RUN cp server/transformers_patch/modeling_codegen.py ${SITE_PACKAGES}/transformers/models/codegen/modeling_codegen.py
@@ -275,7 +276,7 @@ COPY --from=exllamav2-kernels-builder /usr/src/build/lib.linux-x86_64-cpython-* 
 # Install server
 COPY proto proto
 COPY server server
-RUN cd server && make gen-server && pip install ".[accelerate, onnx-gpu, quantize]" --no-cache-dir
+RUN cd server && make gen-server && dnf install -y git && pip install ".[accelerate, openvino]" --no-cache-dir
 
 # Patch codegen model changes into transformers 4.34.0
 RUN cp server/transformers_patch/modeling_codegen.py ${SITE_PACKAGES}/transformers/models/codegen/modeling_codegen.py
@@ -297,6 +298,8 @@ RUN chmod -R g+w ${SITE_PACKAGES}/text_generation_server /usr/src /usr/local/bin
 
 # Run as non-root user by default
 USER tgis
+
+RUN pip freeze
 
 EXPOSE ${PORT}
 EXPOSE ${GRPC_PORT}
