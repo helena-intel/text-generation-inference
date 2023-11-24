@@ -183,7 +183,7 @@ This command will print the Docker image id for `text-gen-server`. Set `IMAGE_ID
 volume=$PWD/data
 mkdir $volume
 chmod 777 $volume
-MODEL=helenai/Salesforce-codegen-2B-ov
+MODEL=helenai/Salesforce-codegen-2B-multi-ov
 ```
 
 First download the weights to the cache directory. In this example, we use a pre-converted OpenVINO model from the Hugging Face Hub.

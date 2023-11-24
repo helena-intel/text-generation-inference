@@ -28,6 +28,7 @@ onnxruntime = { version = "^1.16.2", optional = true }
 onnxruntime-gpu = { version = "^1.16.2", optional = true }
 onnx = { version = "^1.15.0", optional = true }
 einops = "^0.7.0"
+torch = {version = ">=2.0", source = "pytorch_cpu"}
 
 
 # Explicitly install some transitive dependencies to avoid CVEs
@@ -44,11 +45,16 @@ onnx = ["optimum", "onnxruntime", "onnx"]
 onnx-gpu = ["optimum", "onnxruntime-gpu", "onnx"]
 # These are only required if using the quantize cli command
 quantize = ["datasets", "texttable"]
-openvino = ["optimum-intel"]
+openvino = ["optimum-intel", "torch"]
 
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.59.2"
 pytest = "^7.4.2"
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "supplemental"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
