@@ -133,7 +133,7 @@ ENV PATH=/opt/miniconda/bin:$PATH
 # Install server
 COPY proto proto
 COPY server server
-RUN cd server && make gen-server && pip install ".[accelerate, openvino]" --no-cache-dir
+RUN cd server && make gen-server && pip install ".[accelerate, openvino]" --no-cache-dir && pip uninstall -y openvino && pip install openvino-nightly
 
 # Patch codegen model changes into transformers 4.34.0
 RUN cp server/transformers_patch/modeling_codegen.py ${SITE_PACKAGES}/transformers/models/codegen/modeling_codegen.py
