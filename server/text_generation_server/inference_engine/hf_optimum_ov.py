@@ -40,15 +40,23 @@ class InferenceEngine(BaseInferenceEngine):
 
         print(f"ov_config: {ov_config}")
 
+        # Set quantize to "weightcompression" to compress model weights to INT8 on the fly.
+        # This should not be used for an already quantized model.
+        load_in_8bit = False
+        if quantize=="weightcompression":
+            load_in_8bit = True
+        elif quantize is not None:
+            raise ValueError(f"{quantize} quantization not supported by hf_optimum_ov engine")
+
         kwargs = {
             "model_id": model_path,
-            "local_files_only": True,
             "trust_remote_code": TRUST_REMOTE_CODE,
             "export": False,
-            "ov_config": ov_config
+            "ov_config": ov_config,
+            "load_in_8bit": load_in_8bit
         }
 
-        model_is_ov = any(f.endswith("openvino_model.xml") for f in os.listdir(model_path))
+        model_is_ov = any(f.endswith("_model.xml") for f in os.listdir(model_path))
 
         if model_is_ov:
             print("Loading IR model directly")
@@ -57,7 +65,6 @@ class InferenceEngine(BaseInferenceEngine):
             print(f"Load of IR model took {time.time() - load_start:.3f}s")
 
         else:
-            # Note it's currently not supported for both of these to be true - optimization will fail
             print("Converting transformers model to OpenVINO")
             kwargs["export"] = True
 
@@ -67,7 +74,9 @@ class InferenceEngine(BaseInferenceEngine):
                 f"Conversion to OpenVINO and initial loading took {time.time() - convert_start:.3f}s"
             )
 
+
         # For debugging
-        for k,v in self.model.request.get_compiled_model().get_property("SUPPORTED_PROPERTIES").items():
-            print(k, self.model.request.get_compiled_model().get_property(k))
+        if model_class == AutoModelForCausalLM:
+            for k,v in self.model.request.get_compiled_model().get_property("SUPPORTED_PROPERTIES").items():
+                print(k, self.model.request.get_compiled_model().get_property(k))
 

@@ -3,7 +3,7 @@
 > This branch contains a POC of OpenVINO support for [IBM's text-generation-inference](https://github.com/IBM/text-generation-inference) (TGIS) fork of Hugging Face's [text-generation-inference](https://github.com/huggingface/text-generation-inference) repo.
 It is definitely not meant for production use. It uses [openvino-nightly](https://pypi.org/project/openvino-nightly/) which has the following disclaimer: *NOTE: This version is pre-release software and has not undergone full release validation or qualification. No support is offered on pre-release software and APIs/behavior are subject to change. It should NOT be incorporated into any production software/solution and instead should be used only for early testing and integration while awaiting a final release version of this software.*
 
-Scroll down to the end of this README for an example of how to do inference with OpenVINO using TGIS.
+Refer to [./server/text_generation_server/inference_engine/README_OpenVINO.md](this documentation) about how to use TGIS to run inference with OpenVINO.
 
 ---
 
@@ -164,54 +164,3 @@ They are all prefixed with `tgi_`. Descriptions will be added to the table below
 | `tgi_tokenize_request_tokens`              | `histogram` |                                                     | Count of tokenized tokens per tokenize request                                     |
 | `tgi_tokenize_request_duration`            | `histogram` |                                                     | Tokenize request duration (in seconds)                                             |
 
-
-### Run Inference Locally with OpenVINO
-
-#### 0. Build the image with OpenVINO support
-
-```
-git clone https://github.com/helena-intel/text-generation-inference -b openvino-support --single-branch
-cd text-generation-inference
-make build
-```
-
-This command will print the Docker image id for `text-gen-server`. Set `IMAGE_ID` in the commands below to this.
-
-#### 1. Run the server
-
-```
-volume=$PWD/data
-mkdir $volume
-chmod 777 $volume
-MODEL=helenai/Salesforce-codegen-2B-multi-ov
-```
-
-First download the weights to the cache directory. In this example, we use a pre-converted OpenVINO model from the Hugging Face Hub.
-
-```
-docker run -e TRANSFORMERS_CACHE=/data -e HUGGINGFACE_HUB_CACHE=/data -v $volume:/data $IMAGE_ID  text-generation-server download-weights $MODEL --extension ".json,.xml,.bin"
-```
-
-You can then run the inference server with:
-
-```
-docker run -p 8033:8033 -p 3000:3000 -e TRANSFORMERS_CACHE=/data -e HUGGINGFACE_HUB_CACHE=/data -e DEPLOYMENT_FRAMEWORK=hf_optimum_ov -v $volume:/data $IMAGE_ID text-generation-launcher --model-name $MODEL --dtype-str float32 --deployment-framework hf_optimum_ov
-```
-
-#### 3. Prepare the client
-
-Install GRPC in a Python environment: `pip install grpcio grpcio-tools`
-
-In the repository root, run:
-```
-python -m grpc_tools.protoc -Iproto --python_out=pb --pyi_out=pb --grpc_python_out=pb proto/generate.proto
-python -m grpc_tools.protoc -Iproto --python_out=pb --pyi_out=pb --grpc_python_out=pb proto/generation.proto
-```
-This generates the necessary files in the pb directory.
-
-Then to run inference:
-```
-python pb/client.py
-```
-
-Edit `pb/client.py` to change the prompts.
