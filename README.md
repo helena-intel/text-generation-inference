@@ -3,7 +3,7 @@
 > This branch contains a POC of OpenVINO support for [IBM's text-generation-inference](https://github.com/IBM/text-generation-inference) (TGIS) fork of Hugging Face's [text-generation-inference](https://github.com/huggingface/text-generation-inference) repo.
 It is definitely not meant for production use. It uses [openvino-nightly](https://pypi.org/project/openvino-nightly/) which has the following disclaimer: *NOTE: This version is pre-release software and has not undergone full release validation or qualification. No support is offered on pre-release software and APIs/behavior are subject to change. It should NOT be incorporated into any production software/solution and instead should be used only for early testing and integration while awaiting a final release version of this software.*
 
-Refer to [./server/text_generation_server/inference_engine/README_OpenVINO.md](this documentation) about how to use TGIS to run inference with OpenVINO.
+Refer to [this documentation](./server/text_generation_server/inference_engine/README_OpenVINO.md) about how to use TGIS to run inference with OpenVINO.
 
 ---
 
