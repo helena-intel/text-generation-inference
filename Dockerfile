@@ -128,7 +128,7 @@ RUN cargo install --path .
 ## Tests base ##################################################################
 FROM base as test-base
 
-RUN dnf install -y make unzip python3.11 python3.11-pip gcc openssl-devel gcc-c++ && \
+RUN dnf install -y git make unzip python3.11 python3.11-pip gcc openssl-devel gcc-c++ && \
     dnf clean all && \
     ln -fs /usr/bin/python3.11 /usr/bin/python3 && \
     ln -s /usr/bin/python3.11 /usr/local/bin/python && ln -s /usr/bin/pip3.11 /usr/local/bin/pip
@@ -154,8 +154,8 @@ COPY server/Makefile server/Makefile
 # Install server
 COPY proto proto
 COPY server server
-# RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]"
-RUN cd server && make gen-server && pip install ".[accelerate, openvino]" --no-cache-dir
+RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
+# RUN cd server && make gen-server && pip install ".[accelerate, openvino]" --no-cache-dir && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
 
 # Patch codegen model changes into transformers 4.35
 RUN cp server/transformers_patch/modeling_codegen.py ${SITE_PACKAGES}/transformers/models/codegen/modeling_codegen.py
@@ -274,8 +274,8 @@ COPY --from=exllamav2-kernels-builder /usr/src/build/lib.linux-x86_64-cpython-* 
 # Install server
 COPY proto proto
 COPY server server
-# RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]"
-RUN cd server && make gen-server && pip install ".[accelerate, onnx-gpu, openvino, quantize]" --no-cache-dir
+RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
+# RUN cd server && make gen-server && pip install ".[accelerate, onnx-gpu, openvino, quantize]" --no-cache-dir && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
 
 # Patch codegen model changes into transformers 4.35
 RUN cp server/transformers_patch/modeling_codegen.py ${SITE_PACKAGES}/transformers/models/codegen/modeling_codegen.py
