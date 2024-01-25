@@ -17,11 +17,11 @@ message = json_format.ParseDict(
 response = stub.Generate(message)
 
 # prompts = ["def hello_world():", "def calculate_square_root(number):", "def add_numbers", "function add_numbers"]
-prompts = ["The weather is", "The cat is walking on", "I would like to"]
+prompts = ["The weather is nice", "The cat is walking on", "I would like to"]
 
 # optional: parameters for inference
 params = pb2.Parameters(
-    method="GREEDY", stopping=pb2.StoppingCriteria(min_new_tokens=20, max_new_tokens=20)
+    method="GREEDY", stopping=pb2.StoppingCriteria(min_new_tokens=128, max_new_tokens=128)
 )
 
 # time inference
