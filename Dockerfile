@@ -154,7 +154,9 @@ COPY server/Makefile server/Makefile
 # Install server
 COPY proto proto
 COPY server server
-RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
+RUN cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel nncf -y && pip install git+https://github.com/huggingface/optimum-intel.git --no-cache-dir --no-deps
+# RUN cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel nncf -y && pip install git+https://github.com/helena-intel/optimum-intel.git@concurrency_support_cloneall_test --force-reinstall --no-cache-dir --no-deps
+# RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel nncf -y && pip install git+https://github.com/helena-intel/optimum-intel.git@concurrency_support_cloneall_test
 # RUN cd server && make gen-server && pip install ".[accelerate, openvino]" --no-cache-dir && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
 
 # Patch codegen model changes into transformers 4.35
@@ -274,7 +276,8 @@ COPY --from=exllamav2-kernels-builder /usr/src/build/lib.linux-x86_64-cpython-* 
 # Install server
 COPY proto proto
 COPY server server
-RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
+RUN cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel nncf -y && pip install git+https://github.com/huggingface/optimum-intel.git --no-cache-dir --no-deps
+# RUN --mount=type=cache,target=/root/.cache/pip cd server && make gen-server && pip install ".[accelerate, openvino]" && pip uninstall optimum-intel nncf -y && pip install git+https://github.com/helena-intel/optimum-intel.git@concurrency_support_cloneall_test
 # RUN cd server && make gen-server && pip install ".[accelerate, onnx-gpu, openvino, quantize]" --no-cache-dir && pip uninstall optimum-intel -y && pip install git+https://github.com/huggingface/optimum-intel.git
 
 # Patch codegen model changes into transformers 4.35
